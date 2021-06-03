@@ -1,0 +1,7 @@
+pollutant,industry,rawmaterial,process,city
+Pb,B_Battery_Ltd,lead acid,,f
+Cu,A_Preservative_PVT,wood preservative,,f
+Cu,B_miners,,waste,f
+PM25,T_PowerPlant,coal,,f
+PM25,T_PowerPlant,,burn,d
+PM25,T_Chemicals,NH4NO3,,d

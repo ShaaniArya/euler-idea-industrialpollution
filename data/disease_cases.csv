@@ -1,0 +1,7 @@
+pollutant,disease,city,count,year
+Pb,Hypertension ,f,1025,2016
+Cu,Lung cancer ,f,200,2016
+PM25,Asthma ,f,598,2016
+PM25,Acute bronchitis ,d,367,2016
+PM25,Lung cancer ,d,180,2016
+O3,Cough ,d,1690,2016
