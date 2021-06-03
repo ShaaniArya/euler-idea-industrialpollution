@@ -122,11 +122,3 @@ MERGE (r:Process{process:process})
 MERGE (i)-[:IS_IN]->(c)
 MERGE (i)-[:HAS]->(r)
 MERGE (p)-[:LINKED_TO]->(r);
-
-
-
-
-#**Finding all the possible industries responsible for pollution in city 'd'**
-MATCH (c:City{city:'d'})<-[r:REPORTED_IN]-(d:Disease)-[:RELATED_TO]->(p:Pollutants)<-[r1:HAS_POLLUTANTS]-(c) WHERE r.reportedYear=r1.reportedOnYr AND r1.reportedLevel>r1.maxPermissibleLevel
-MATCH (p)-[:LINKED_TO]->()<-[]-(i:Industries)-[:IS_IN]->(c)
-RETURN DISTINCT r.reportedYear AS Year, c.city AS City, p.pollutant as Pollutant, d.disease AS Disease, r.patientCount AS DiseaseCaseCount, i.industry AS Industry;
