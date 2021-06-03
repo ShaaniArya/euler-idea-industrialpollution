@@ -1,5 +1,4 @@
-**Once Neo4j DataSetup is complete**
-**Run below query to find yearwise disease, pollutant in all cities and possible industries responsible for it.**
+**Once Neo4j DataSetup is complete, run below query to find yearwise disease, pollutant in all cities and possible industries responsible for it.**
 
 MATCH (c:City)<-[r:REPORTED_IN]-(d:Disease)-[:RELATED_TO]->(p:Pollutants)<-[r1:HAS_POLLUTANTS]-(c) WHERE r.reportedYear=r1.reportedOnYr AND r1.reportedLevel>r1.maxPermissibleLevel
 MATCH (p)-[:LINKED_TO]->()<-[]-(i:Industries)-[:IS_IN]->(c)
