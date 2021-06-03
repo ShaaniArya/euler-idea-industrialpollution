@@ -1,0 +1,132 @@
+CREATE DATABASE pollutiondata;
+
+CREATE CONSTRAINT ON (c:Country) ASSERT c.country IS UNIQUE;
+CREATE CONSTRAINT ON (s:State) ASSERT s.state IS UNIQUE;
+CREATE CONSTRAINT ON (c:City) ASSERT c.city IS UNIQUE;
+CREATE CONSTRAINT ON (d:Disease) ASSERT d.disease IS UNIQUE;
+CREATE CONSTRAINT ON (i:Industries) ASSERT i.industry IS UNIQUE;
+CREATE CONSTRAINT ON (r:RawMaterials) ASSERT r.rawMaterial IS UNIQUE;
+CREATE CONSTRAINT ON (p:Process) ASSERT p.process IS UNIQUE;
+CREATE CONSTRAINT ON (p:Pollutants) ASSERT p.pollutant IS UNIQUE;
+
+
+
+LOAD CSV WITH HEADERS FROM 'file:///CO.csv' AS row
+MERGE (c:City{city:toLower(trim(row.city))})
+MERGE (p:Pollutants{pollutant:'CO'})
+MERGE (c)-[r:HAS_POLLUTANTS{reportedOnMth:toInteger(row.month), reportedOnYr:toInteger(row.year),reportedLevel:toFloat(row.CO),maxPermissibleLevel:4.00}]->(p);
+
+
+LOAD CSV WITH HEADERS FROM 'file:///ozone.csv' AS row
+MERGE (c:City{city:toLower(trim(row.city))})
+MERGE (p:Pollutants{pollutant:'O3'})
+MERGE (c)-[r:HAS_POLLUTANTS{reportedOnMth:toInteger(row.month), reportedOnYr:toInteger(row.year),reportedLevel:toFloat(row.oz),maxPermissibleLevel:180.00}]->(p);
+
+
+LOAD CSV WITH HEADERS FROM 'file:///pm10.csv' AS row
+MERGE (c:City{city:toLower(trim(row.city))})
+MERGE (p:Pollutants{pollutant:'PM10'})
+MERGE (c)-[r:HAS_POLLUTANTS{reportedOnMth:toInteger(row.month), reportedOnYr:toInteger(row.year),reportedLevel:toFloat(row.pm10),maxPermissibleLevel:100.00}]->(p);
+
+
+LOAD CSV WITH HEADERS FROM 'file:///pm25.csv' AS row
+MERGE (c:City{city:toLower(trim(row.city))})
+MERGE (p:Pollutants{pollutant:'PM25'})
+MERGE (c)-[r:HAS_POLLUTANTS{reportedOnMth:toInteger(row.month), reportedOnYr:toInteger(row.year),reportedLevel:toFloat(row.pm25),maxPermissibleLevel:60.00}]->(p);
+
+
+LOAD CSV WITH HEADERS FROM 'file:///SO2.csv' AS row
+MERGE (c:City{city:toLower(trim(row.city))})
+MERGE (p:Pollutants{pollutant:'SO2'})
+MERGE (c)-[r:HAS_POLLUTANTS{reportedOnMth:toInteger(row.month), reportedOnYr:toInteger(row.year),reportedLevel:toFloat(row.SO2),maxPermissibleLevel:80.00}]->(p);
+
+
+
+LOAD CSV WITH HEADERS FROM 'file:///waterpollution.csv' AS row
+WITH row, [item in split(row.date, '.') | toInteger(item)] AS dateComponents WHERE row.NO3 IS NOT NULL
+MERGE (c:City{city:toLower(trim(row.id))})
+MERGE (p:Pollutants{pollutant:'NO3'})
+MERGE (c)-[r:HAS_POLLUTANTS{reportedOnMth:dateComponents[1], reportedOnYr:dateComponents[2],reportedLevel:toFloat(row.NO3),maxPermissibleLevel:45.00}]->(p);
+
+
+
+LOAD CSV WITH HEADERS FROM 'file:///waterpollution.csv' AS row
+WITH row, [item in split(row.date, '.') | toInteger(item)] AS dateComponents WHERE row.SO4 IS NOT NULL
+MERGE (c:City{city:toLower(trim(row.id))})
+MERGE (p1:Pollutants{pollutant:'SO4'})
+MERGE (c)-[r1:HAS_POLLUTANTS{reportedOnMth:dateComponents[1], reportedOnYr:dateComponents[2],reportedLevel:toFloat(row.SO4),maxPermissibleLevel:400.00}]->(p1);
+
+
+LOAD CSV WITH HEADERS FROM 'file:///waterpollution.csv' AS row
+WITH row, [item in split(row.date, '.') | toInteger(item)] AS dateComponents WHERE row.CL IS NOT NULL
+MERGE (c:City{city:toLower(trim(row.id))})
+MERGE (p2:Pollutants{pollutant:'CL'})
+MERGE (c)-[r2:HAS_POLLUTANTS{reportedOnMth:dateComponents[1], reportedOnYr:dateComponents[2],reportedLevel:toFloat(row.CL),maxPermissibleLevel:250.00}]->(p2);
+
+
+
+LOAD CSV WITH HEADERS FROM 'file:///waterpollution.csv' AS row
+WITH row, [item in split(row.date, '.') | toInteger(item)] AS dateComponents WHERE row.NH4 IS NOT NULL
+MERGE (c:City{city:toLower(trim(row.id))})
+MERGE (p3:Pollutants{pollutant:'NH4'})
+MERGE (c)-[r3:HAS_POLLUTANTS{reportedOnMth:dateComponents[1], reportedOnYr:dateComponents[2],reportedLevel:toFloat(row.NH4),maxPermissibleLevel:0.5}]->(p3);
+
+
+
+LOAD CSV WITH HEADERS FROM 'file:///city.csv' AS row
+MERGE (c:City{city:row.city})
+MERGE (s:State{state:row.state})
+MERGE (co:Country{country:row.country})
+MERGE (c)-[:IS_IN]->(s)
+MERGE (s)-[:IS_IN]->(co);
+
+
+LOAD CSV WITH HEADERS FROM "file:///Pb_Cu.csv" as row
+WITH row, SPLIT(row.date,'/') as dateComponents
+MERGE (c:City{city:toLower(trim(row.city))})
+MERGE (p2:Pollutants{pollutant:'Pb'})
+MERGE (c)-[r2:HAS_POLLUTANTS{reportedOnMth:toInteger(dateComponents[1]), reportedOnYr:toInteger(dateComponents[2]),reportedLevel:toFloat(row.Pb),maxPermissibleLevel:0.01}]->(p2)
+MERGE (p3:Pollutants{pollutant:'Cu'})
+MERGE (c)-[r3:HAS_POLLUTANTS{reportedOnMth:toInteger(dateComponents[1]), reportedOnYr:toInteger(dateComponents[2]),reportedLevel:toFloat(row.Cu),maxPermissibleLevel:1.5}]->(p3);
+
+
+LOAD CSV WITH HEADERS FROM 'file:///disease_cases.csv' AS row
+WITH DISTINCT trim(toLower(row.disease)) AS disease, toInteger(row.year) AS yr, trim(toLower(row.city)) AS city, toInteger(row.count) as cnt, row.pollutant AS pollutant
+MATCH(c:City{city:city})
+MATCH(p:Pollutants{pollutant:pollutant})
+WITH c, p, disease, yr, cnt
+MERGE(d:Disease{disease:disease})
+MERGE(d)-[:REPORTED_IN{reportedYear:yr,patientCount:cnt}]->(c)
+MERGE(d)-[:RELATED_TO]->(p);
+
+
+LOAD CSV WITH HEADERS FROM 'file:///industry_rawmaterial.csv' AS row
+WITH DISTINCT trim(toLower(row.industry)) AS industry, trim(toLower(row.city)) AS city, row.pollutant AS pollutant, trim(toLower(row.rawmaterial)) AS raw WHERE raw IS NOT NULL
+MATCH (c:City{city:city})
+MATCH (p:Pollutants{pollutant:pollutant})
+WITH c,p,industry, raw
+MERGE (i:Industries{industry:industry})
+MERGE (r:RawMaterials{rawMaterial:raw})
+MERGE (i)-[:IS_IN]->(c)
+MERGE (i)-[:USES]->(r)
+MERGE (p)-[:LINKED_TO]->(r);
+
+
+LOAD CSV WITH HEADERS FROM 'file:///industry_rawmaterial.csv' AS row
+WITH DISTINCT trim(toLower(row.industry)) AS industry, trim(toLower(row.city)) AS city, row.pollutant AS pollutant, trim(toLower(row.process)) AS process WHERE process IS NOT NULL
+MATCH (c:City{city:city})
+MATCH (p:Pollutants{pollutant:pollutant})
+WITH c,p,industry, process
+MERGE (i:Industries{industry:industry})
+MERGE (r:Process{process:process})
+MERGE (i)-[:IS_IN]->(c)
+MERGE (i)-[:HAS]->(r)
+MERGE (p)-[:LINKED_TO]->(r);
+
+
+
+
+#**Finding all the possible industries responsible for pollution in city 'd'**
+MATCH (c:City{city:'d'})<-[r:REPORTED_IN]-(d:Disease)-[:RELATED_TO]->(p:Pollutants)<-[r1:HAS_POLLUTANTS]-(c) WHERE r.reportedYear=r1.reportedOnYr AND r1.reportedLevel>r1.maxPermissibleLevel
+MATCH (p)-[:LINKED_TO]->()<-[]-(i:Industries)-[:IS_IN]->(c)
+RETURN DISTINCT r.reportedYear AS Year, c.city AS City, p.pollutant as Pollutant, d.disease AS Disease, r.patientCount AS DiseaseCaseCount, i.industry AS Industry;
