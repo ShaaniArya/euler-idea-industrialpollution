@@ -1,4 +1,4 @@
-**Copy and run the Load CSV cypher in Neo4j as per the file neo4j datasetup.txt**
+**Copy and run the Load CSV cypher in Neo4j as per the file "neo4j datasetup.txt"**
 
 **Once Neo4j DataSetup is complete, run below query to find yearwise disease, pollutant in all cities and possible industries responsible for it.**
 
