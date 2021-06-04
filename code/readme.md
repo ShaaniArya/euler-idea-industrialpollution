@@ -13,13 +13,30 @@ RETURN DISTINCT r.reportedYear AS Year, c.city AS City, p.pollutant as Pollutant
 
 
 **Run industrial_pollution_graphQL.js file and open Apollo Server at localhost:4000/**
-**Query for Apollo Server (provide city name and year as input)-**
+**Query for Apollo Server**
+
+**Possible Industries causing pollution in city for a given year**
 
 query{ 
-potentialIndustries(city:"f", year:2016){ 
-industry 
+  potentialIndustries(city:"f", year:2016){ 
+    industry 
   } 
 }
 
 **Output:**
 ![image](https://user-images.githubusercontent.com/85310413/120697774-c35d2a00-c4cb-11eb-9fd5-1041a9dd1c54.png)
+
+
+**Possible Industries causing pollution and specific disease in city for a given year**
+query{
+  potentialIndustries_Disease(city:"d",year:2016, disease:"cough"){
+    industry
+  }
+}
+
+**Polluted Cities for a given year**
+query{
+  pollutedCities(year:2016){
+    city
+  }
+}
