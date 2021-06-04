@@ -9,10 +9,16 @@ const typeDefs = `
 	industry: String
 	}
 
+    type City{
+	city: String
+	}
+
 
     type Query{
 	industry:[Industries]
 	potentialIndustries(city: String ="d", year: Int = 2016): [Industries] @cypher(statement: """MATCH (c:City{city: $city})<-[r:REPORTED_IN]-(d:Disease)-[:RELATED_TO]->(p:Pollutants)<-[r1:HAS_POLLUTANTS]-(c) WHERE r.reportedYear=$year AND r1.reportedOnYr=$year AND r1.reportedLevel>r1.maxPermissibleLevel MATCH (p)-[:LINKED_TO]->()<-[]-(i:Industries)-[:IS_IN]->(c) RETURN DISTINCT i""")
+	potentialIndustries_Disease(city: String ="d", year: Int = 2016, disease: String ="hypertension"): [Industries] @cypher(statement: """MATCH (c:City{city: $city})<-[r:REPORTED_IN]-(d:Disease)-[:RELATED_TO]->(p:Pollutants)<-[r1:HAS_POLLUTANTS]-(c) WHERE r.reportedYear=$year AND r1.reportedOnYr=$year AND r1.reportedLevel>r1.maxPermissibleLevel MATCH (p)-[:LINKED_TO]->()<-[]-(i:Industries)-[:IS_IN]->(c) RETURN DISTINCT i""")
+	pollutedCities(year: Int =2016): [City] @cypher(statement: """MATCH (c:City)-[r1:HAS_POLLUTANTS]->(p:Pollutants) WHERE r1.reportedOnYr=$year AND r1.reportedLevel>r1.maxPermissibleLevel RETURN DISTINCT c""")
 	}
 `;
 
