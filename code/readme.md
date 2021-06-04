@@ -28,13 +28,17 @@ query{
 
 
 **Possible Industries causing pollution and specific disease in city for a given year**
+
 query{
   potentialIndustries_Disease(city:"d",year:2016, disease:"cough"){
     industry
   }
 }
 
+
+
 **Polluted Cities for a given year**
+
 query{
   pollutedCities(year:2016){
     city
